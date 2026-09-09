@@ -1,0 +1,38 @@
+name: Fetch TikTok test video
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fetch-tiktok-video.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-and-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Download MP4 from Higgsfield CDN
+        run: |
+          mkdir -p media
+          curl -L --fail --retry 3 \
+            'https://d2ol7oe51mr4n9.cloudfront.net/user_3J4xM7JBNOEkTQoK6JzQ4a2iLoL/96fbcd9b-0899-4d33-8e74-058050c68565.mp4' \
+            -o media/tiktok-test.mp4
+          test -s media/tiktok-test.mp4
+
+      - name: Commit downloaded video
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add media/tiktok-test.mp4
+          if git diff --cached --quiet; then
+            echo 'No changes to commit.'
+          else
+            git commit -m 'Add TikTok test video'
+            git push
+          fi
