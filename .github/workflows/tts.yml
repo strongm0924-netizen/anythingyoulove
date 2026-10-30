@@ -2,7 +2,7 @@ name: Generate TTS
 
 on:
   push:
-    branches: [tts-test]
+    branches: [main, tts-test]
     paths:
       - "tts/script.txt"
       - ".github/workflows/tts.yml"
