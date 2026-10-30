@@ -1,0 +1,44 @@
+name: Generate TTS
+
+on:
+  push:
+    branches: [main, tts-test]
+    paths:
+      - "tts/script.txt"
+      - ".github/workflows/tts.yml"
+  workflow_dispatch:
+
+jobs:
+  tts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Edge TTS
+        run: pip install edge-tts
+
+      - name: Generate Korean voice and subtitles
+        shell: bash
+        run: |
+          TEXT="$(cat tts/script.txt)"
+          edge-tts \
+            --text "$TEXT" \
+            --voice ko-KR-SunHiNeural \
+            --write-media tts/voice.mp3 \
+            --write-subtitles tts/voice.vtt
+
+      - name: Upload TTS output
+        uses: actions/upload-artifact@v4
+        with:
+          name: tts-output
+          path: |
+            tts/voice.mp3
+            tts/voice.vtt
+          if-no-files-found: error
+          retention-days: 7
