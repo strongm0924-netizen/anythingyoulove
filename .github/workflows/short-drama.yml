@@ -30,6 +30,19 @@ jobs:
       - name: Install Python packages
         run: pip install edge-tts pillow
 
+      - name: Patch Edge-TTS CLI parsing
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('scripts/build_short_drama.py')
+          s = p.read_text(encoding='utf-8')
+          old = "run(['edge-tts','--voice',voice,'--rate',rate,'--pitch',pitch,'--text',text,'--write-media',str(out)])"
+          new = "run(['edge-tts','--voice',voice,f'--rate={rate}',f'--pitch={pitch}','--text',text,'--write-media',str(out)])"
+          if old not in s:
+              raise SystemExit('Expected Edge-TTS call not found')
+          p.write_text(s.replace(old,new), encoding='utf-8')
+          PY
+
       - name: Build Chinese short drama EP01
         run: python scripts/build_short_drama.py
 
