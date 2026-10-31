@@ -29,8 +29,8 @@ jobs:
       - name: Install Python packages
         run: pip install edge-tts pillow
 
-      - name: Fix Edge TTS rate argument
-        run: sed -i "s/'--rate','-5%'/'--rate=-5%'/g" scripts/build_history_video.py
+      - name: Set narration pace for 11-minute cut
+        run: sed -i "s/'--rate','-5%'/'--rate=-13%'/g" scripts/build_history_video.py
 
       - name: Build 20-scene history video
         run: python scripts/build_history_video.py
