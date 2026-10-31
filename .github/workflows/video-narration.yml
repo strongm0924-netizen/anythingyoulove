@@ -7,13 +7,14 @@ on:
       - "video/scenes.json"
       - "video/asset_queries.json"
       - "scripts/build_docu_pro.py"
+      - "scripts/replace_voice_melo.py"
       - ".github/workflows/video-narration.yml"
   workflow_dispatch:
 
 jobs:
   build-video:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -21,27 +22,37 @@ jobs:
       - name: Install system packages
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg fonts-noto-cjk
+          sudo apt-get install -y ffmpeg fonts-noto-cjk git
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.10"
 
-      - name: Install Python packages
+      - name: Install base Python packages
         run: pip install edge-tts pillow requests
 
-      - name: Build premium 1080p documentary
+      - name: Build premium 1080p documentary base
         run: python scripts/build_docu_pro.py
+
+      - name: Install MeloTTS
+        run: |
+          git clone --depth 1 https://github.com/myshell-ai/MeloTTS.git /tmp/MeloTTS
+          pip install -e /tmp/MeloTTS
+          python -m unidic download
+
+      - name: Replace narration with MeloTTS Korean voice
+        run: python scripts/replace_voice_melo.py
 
       - name: Upload finished documentary
         uses: actions/upload-artifact@v4
         with:
-          name: island-korea-documentary-pro
+          name: island-korea-documentary-melo
           path: |
             build/final.mp4
             build/thumbnail.png
             build/duration.txt
+            build/voice_engine.txt
             build/credits.txt
             build/credits.json
           if-no-files-found: error
