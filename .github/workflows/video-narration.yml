@@ -1,0 +1,95 @@
+name: Generate Narration Video
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "video/title.txt"
+      - "video/script.txt"
+      - ".github/workflows/video-narration.yml"
+  workflow_dispatch:
+
+jobs:
+  build-video:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install system packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-noto-cjk
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python packages
+        run: pip install edge-tts pillow
+
+      - name: Prepare output folders
+        run: mkdir -p build
+
+      - name: Generate title cover image
+        run: |
+          python <<'PY'
+          from PIL import Image, ImageDraw, ImageFont
+          import textwrap
+          title = open('video/title.txt', encoding='utf-8').read().strip()
+          W, H = 1280, 720
+          img = Image.new('RGB', (W, H), '#0b1f3a')
+          draw = ImageDraw.Draw(img)
+          for y in range(H):
+              ratio = y / H
+              r = int(11 + (25 - 11) * ratio)
+              g = int(31 + (92 - 31) * ratio)
+              b = int(58 + (150 - 58) * ratio)
+              draw.line([(0, y), (W, y)], fill=(r, g, b))
+          font_path = '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc'
+          title_font = ImageFont.truetype(font_path, 64)
+          sub_font = ImageFont.truetype(font_path, 28)
+          small_font = ImageFont.truetype(font_path, 24)
+          draw.ellipse((930, 120, 1160, 350), outline=(255,255,255), width=4)
+          draw.ellipse((980, 170, 1110, 300), outline=(180,220,255), width=3)
+          draw.arc((120, 460, 480, 820), start=200, end=340, fill=(210,240,255), width=5)
+          wrapped = textwrap.wrap(title, width=14)
+          y = 180
+          for line in wrapped:
+              draw.text((90, y), line, font=title_font, fill='white')
+              y += 78
+          subtitle = '가정 역사 시나리오 | 한국이 섬나라였다면 어떤 변화가 생겼을까?'
+          draw.text((95, y + 20), subtitle, font=sub_font, fill=(225, 240, 255))
+          draw.rounded_rectangle((90, 520, 720, 630), radius=22, outline=(255,255,255), width=3)
+          draw.text((120, 548), 'Narration Video Demo', font=small_font, fill='white')
+          draw.text((120, 585), 'Audio: ko-KR-SunHiNeural', font=small_font, fill=(220,235,255))
+          img.save('build/cover.png')
+          PY
+
+      - name: Generate Korean narration audio
+        run: |
+          TEXT=$(tr '\n' ' ' < video/script.txt)
+          edge-tts \
+            --text "$TEXT" \
+            --voice ko-KR-SunHiNeural \
+            --write-media build/voice.mp3
+
+      - name: Create MP4 video with narration
+        run: |
+          ffmpeg -y -loop 1 -i build/cover.png -i build/voice.mp3 \
+            -c:v libx264 -tune stillimage -pix_fmt yuv420p \
+            -c:a aac -b:a 192k -shortest \
+            -vf "scale=1280:720" \
+            build/final.mp4
+
+      - name: Upload video artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: narration-video-output
+          path: |
+            build/cover.png
+            build/voice.mp3
+            build/final.mp4
+          if-no-files-found: error
+          retention-days: 7
