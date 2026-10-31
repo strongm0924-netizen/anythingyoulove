@@ -5,13 +5,15 @@ on:
     branches: [main]
     paths:
       - "video/scenes.json"
-      - "scripts/build_history_video.py"
+      - "video/asset_queries.json"
+      - "scripts/build_docu_pro.py"
       - ".github/workflows/video-narration.yml"
   workflow_dispatch:
 
 jobs:
   build-video:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -27,21 +29,20 @@ jobs:
           python-version: "3.11"
 
       - name: Install Python packages
-        run: pip install edge-tts pillow
+        run: pip install edge-tts pillow requests
 
-      - name: Set narration pace for 11-minute cut
-        run: sed -i "s/'--rate','-5%'/'--rate=-13%'/g" scripts/build_history_video.py
+      - name: Build premium 1080p documentary
+        run: python scripts/build_docu_pro.py
 
-      - name: Build 20-scene history video
-        run: python scripts/build_history_video.py
-
-      - name: Upload finished video
+      - name: Upload finished documentary
         uses: actions/upload-artifact@v4
         with:
-          name: island-korea-11min-video
+          name: island-korea-documentary-pro
           path: |
             build/final.mp4
             build/thumbnail.png
             build/duration.txt
+            build/credits.txt
+            build/credits.json
           if-no-files-found: error
           retention-days: 7
