@@ -1,0 +1,79 @@
+name: Qwen Full Korean Narration
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/qwen_full_chunk.py"
+      - "scripts/assemble_qwen_audio.py"
+      - ".github/workflows/qwen-full-narration.yml"
+  workflow_dispatch:
+
+jobs:
+  generate:
+    strategy:
+      fail-fast: false
+      matrix:
+        chunk:
+          - {name: "01-05", start: 1, end: 5}
+          - {name: "06-10", start: 6, end: 10}
+          - {name: "11-15", start: 11, end: 15}
+          - {name: "16-20", start: 16, end: 20}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install "qwen-tts>=0.0.5" soundfile numpy torch
+
+      - name: Generate chunk ${{ matrix.chunk.name }}
+        run: python scripts/qwen_full_chunk.py --start ${{ matrix.chunk.start }} --end ${{ matrix.chunk.end }}
+
+      - name: Upload chunk
+        uses: actions/upload-artifact@v4
+        with:
+          name: qwen-chunk-${{ matrix.chunk.name }}
+          path: build/qwen_parts/*.wav
+          if-no-files-found: error
+          retention-days: 7
+
+  assemble:
+    needs: generate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Download all chunks
+        uses: actions/download-artifact@v4
+        with:
+          pattern: qwen-chunk-*
+          path: build/qwen_parts
+          merge-multiple: true
+
+      - name: Assemble clean full narration
+        run: python scripts/assemble_qwen_audio.py
+
+      - name: Upload full narration
+        uses: actions/upload-artifact@v4
+        with:
+          name: qwen-aiden-korean-full
+          path: |
+            build/qwen_aiden_full.wav
+            build/qwen_aiden_full.m4a
+            build/qwen_voice_info.txt
+          if-no-files-found: error
+          retention-days: 7
