@@ -1,0 +1,37 @@
+name: Qwen Voice Cadence Parallel
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/qwen_voice_cadence_parallel.py"
+      - ".github/workflows/qwen-voice-cadence-parallel.yml"
+  workflow_dispatch:
+
+jobs:
+  generate:
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [cadence_a, cadence_b, cadence_c]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install "qwen-tts>=0.0.5" soundfile numpy torch
+      - name: Generate cadence voice
+        env:
+          VOICE_VARIANT: ${{ matrix.variant }}
+        run: python scripts/qwen_voice_cadence_parallel.py
+      - name: Upload cadence voice
+        uses: actions/upload-artifact@v4
+        with:
+          name: qwen-${{ matrix.variant }}
+          path: build/qwen_voice_cadence_parallel/*
+          retention-days: 7
