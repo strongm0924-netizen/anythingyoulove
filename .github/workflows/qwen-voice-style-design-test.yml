@@ -1,0 +1,38 @@
+name: Qwen Voice Style Design Test
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/qwen_voice_style_design_test.py"
+      - ".github/workflows/qwen-voice-style-design-test.yml"
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install "qwen-tts>=0.0.5" soundfile numpy torch
+
+      - name: Generate style test
+        run: python scripts/qwen_voice_style_design_test.py
+
+      - name: Upload style test
+        uses: actions/upload-artifact@v4
+        with:
+          name: qwen-voice-style-design-test
+          path: build/qwen_voice_style_design_test/*
+          if-no-files-found: error
+          retention-days: 7
