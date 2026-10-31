@@ -1,0 +1,58 @@
+name: Qwen Oil Korea Group3
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/qwen_oil_korea_group3_voice.py"
+      - ".github/workflows/qwen-oil-korea-group3.yml"
+  workflow_dispatch:
+
+jobs:
+  generate:
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        include:
+          - {name: "01-03", start: 1, end: 3}
+          - {name: "04-06", start: 4, end: 6}
+          - {name: "07-09", start: 7, end: 9}
+          - {name: "10-12", start: 10, end: 12}
+          - {name: "13-15", start: 13, end: 15}
+          - {name: "16-18", start: 16, end: 18}
+          - {name: "19-21", start: 19, end: 21}
+          - {name: "22-24", start: 22, end: 24}
+          - {name: "25-27", start: 25, end: 27}
+          - {name: "28-30", start: 28, end: 30}
+          - {name: "31-33", start: 31, end: 33}
+          - {name: "34-36", start: 34, end: 36}
+          - {name: "37-39", start: 37, end: 39}
+          - {name: "40-42", start: 40, end: 42}
+          - {name: "43-45", start: 43, end: 45}
+          - {name: "46-48", start: 46, end: 48}
+          - {name: "49-51", start: 49, end: 51}
+          - {name: "52-54", start: 52, end: 54}
+          - {name: "55-57", start: 55, end: 57}
+          - {name: "58-60", start: 58, end: 60}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install "qwen-tts>=0.0.5" soundfile numpy torch
+      - name: Generate grouped narration
+        env:
+          START_SCENE: ${{ matrix.start }}
+          END_SCENE: ${{ matrix.end }}
+        run: python scripts/qwen_oil_korea_group3_voice.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qwen-oil-korea-group3-${{ matrix.name }}
+          path: build/qwen_oil_korea_group3/*
+          retention-days: 7
