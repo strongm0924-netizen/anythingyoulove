@@ -1,0 +1,30 @@
+name: Qwen Korean Pronunciation Fix
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/qwen_korean_pronunciation_fix.py"
+      - ".github/workflows/qwen-korean-pronunciation-fix.yml"
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install "qwen-tts>=0.0.5" soundfile numpy torch
+      - name: Generate voice
+        run: python scripts/qwen_korean_pronunciation_fix.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qwen-korean-pronunciation-fix
+          path: build/qwen_korean_pronunciation_fix/*
+          retention-days: 7
