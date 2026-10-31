@@ -1,0 +1,25 @@
+{
+  "series": "今晚别回家",
+  "episode": 1,
+  "title": "别开门",
+  "logline": "林夏雨收到来自‘明天的自己’的警告，而家门口等她的男友手机里却出现了诡异指令。",
+  "characters": {
+    "林夏雨": "24岁，会计公司职员。长黑发、白衬衫、黑色西装外套。敏锐但容易紧张。",
+    "顾言": "28岁，网络安全工程师。黑色长外套，冷静克制。知道远比他说出来的更多。",
+    "神秘声音": "与林夏雨完全相同的声音，身份未知。"
+  },
+  "scenes": [
+    {"id":1,"duration":4.2,"visual":"phone","sender":"林夏雨","phone_title":"来自明天的语音","phone_body":"夏雨，听我说。今晚十一点前，千万别回家。","speaker":"神秘声音","tts":"夏雨，听我说。今晚十一点前，千万别回家。","subtitle":"今晚十一点前……千万别回家。","sfx":"vibration","shot":"push"},
+    {"id":2,"duration":4.0,"visual":"elevator","actors":"xiayu","xiayu_x":355,"xiayu_y":485,"xiayu_scale":1.36,"xiayu_emotion":"shocked","speaker":"林夏雨","tts":"谁在恶作剧？","subtitle":"谁在恶作剧？","shot":"push"},
+    {"id":3,"duration":5.2,"visual":"phone","sender":"林夏雨","phone_title":"第2条语音","phone_body":"还有，你家门口等你的那个男人……不是顾言。","speaker":"神秘声音","tts":"还有，你家门口等你的那个男人……不是顾言。","subtitle":"你家门口等你的那个男人……不是顾言。","sfx":"vibration","shot":"push"},
+    {"id":4,"duration":4.2,"visual":"hallway","actors":"guyan","guyan_x":480,"guyan_y":480,"guyan_scale":1.28,"guyan_emotion":"neutral","speaker":"顾言","tts":"你终于回来了。","subtitle":"你终于回来了。","sfx":"ding","sfx_delay_ms":0,"shot":"push"},
+    {"id":5,"duration":4.5,"visual":"phone","sender":"林夏雨","phone_title":"紧急警告","phone_body":"别让他看见你的手机。","warning":true,"speaker":"神秘声音","tts":"别让他看见你的手机。","subtitle":"别让他看见你的手机。","sfx":"vibration"},
+    {"id":6,"duration":5.0,"visual":"hallway","actors":"both","xiayu_x":190,"xiayu_y":525,"guyan_x":515,"guyan_y":500,"guyan_move":-35,"xiayu_move":-12,"guyan_emotion":"neutral","xiayu_emotion":"afraid","speaker":"顾言","tts":"怎么了？你脸色怎么这么难看？","subtitle":"怎么了？你脸色怎么这么难看？","sfx":"step","shot":"push"},
+    {"id":7,"duration":4.3,"visual":"hallway","actors":"both","xiayu_x":185,"xiayu_y":525,"guyan_x":510,"guyan_y":500,"xiayu_move":-28,"xiayu_emotion":"afraid","speaker":"林夏雨","tts":"没什么。电梯里……有点闷。","subtitle":"没什么。电梯里……有点闷。"},
+    {"id":8,"duration":4.7,"visual":"hallway","actors":"both","xiayu_x":180,"xiayu_y":525,"guyan_x":500,"guyan_y":500,"guyan_emotion":"cold","speaker":"顾言","tts":"你的手机一直在响。谁找你？","subtitle":"你的手机一直在响。谁找你？","shot":"push"},
+    {"id":9,"duration":4.8,"visual":"hallway","actors":"guyan","guyan_x":395,"guyan_y":480,"guyan_scale":1.4,"guyan_emotion":"cold","overlay":"message","message_sender":"未知联系人","message":"她已经收到录音了。\n按计划继续。","sfx":"vibration","shot":"push"},
+    {"id":10,"duration":4.2,"visual":"hallway","actors":"xiayu","xiayu_x":355,"xiayu_y":500,"xiayu_scale":1.42,"xiayu_emotion":"shocked","speaker":"林夏雨","tts":"顾言……你到底是谁？","subtitle":"顾言……你到底是谁？","sfx":"hit","shot":"push"},
+    {"id":11,"duration":5.1,"visual":"hallway","actors":"guyan","guyan_x":355,"guyan_y":490,"guyan_scale":1.46,"guyan_emotion":"cold","speaker":"顾言","tts":"这句话……应该我问你。","subtitle":"这句话……应该我问你。","sfx":"hit","shot":"push"},
+    {"id":12,"duration":5.0,"visual":"hallway","actors":"both","xiayu_x":180,"xiayu_y":525,"guyan_x":510,"guyan_y":500,"xiayu_emotion":"shocked","guyan_emotion":"cold","big_text":"她真的还是林夏雨吗？","subtitle":"第2集：她的身份，开始崩塌。","sfx":"vibration","shot":"push"}
+  ]
+}
