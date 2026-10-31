@@ -1,0 +1,46 @@
+name: Generate Chinese Short Drama
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "drama/**"
+      - "scripts/build_short_drama.py"
+      - ".github/workflows/short-drama.yml"
+
+jobs:
+  build-short-drama:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install system packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-noto-cjk
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python packages
+        run: pip install edge-tts pillow
+
+      - name: Build Chinese short drama EP01
+        run: python scripts/build_short_drama.py
+
+      - name: Upload finished short drama
+        uses: actions/upload-artifact@v4
+        with:
+          name: chinese-short-drama-ep01
+          path: |
+            build_drama/short_drama_ep01.mp4
+            build_drama/poster.png
+            build_drama/duration.txt
+            build_drama/episode_info.json
+          if-no-files-found: error
+          retention-days: 7
