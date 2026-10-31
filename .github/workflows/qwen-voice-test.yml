@@ -1,0 +1,41 @@
+name: Qwen Korean Male Voice Test
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/qwen_voice_test.py"
+      - ".github/workflows/qwen-voice-test.yml"
+  workflow_dispatch:
+
+jobs:
+  voice-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install "qwen-tts>=0.0.5" soundfile numpy torch
+
+      - name: Generate Korean male voice samples
+        run: python scripts/qwen_voice_test.py
+
+      - name: Upload voice samples
+        uses: actions/upload-artifact@v4
+        with:
+          name: qwen-korean-male-voice-test
+          path: |
+            build/qwen_voice_test/aiden_korean.wav
+            build/qwen_voice_test/ryan_korean.wav
+            build/qwen_voice_test/script.txt
+          if-no-files-found: error
+          retention-days: 7
