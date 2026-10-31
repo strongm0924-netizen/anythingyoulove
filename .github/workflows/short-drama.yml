@@ -1,4 +1,4 @@
-name: Generate Chinese Short Drama
+name: Generate English Short Drama
 
 on:
   workflow_dispatch:
@@ -30,30 +30,47 @@ jobs:
       - name: Install Python packages
         run: pip install edge-tts pillow
 
-      - name: Patch Edge-TTS CLI parsing
+      - name: Adapt renderer for English cast and UI
         run: |
           python - <<'PY'
           from pathlib import Path
           p = Path('scripts/build_short_drama.py')
           s = p.read_text(encoding='utf-8')
+          replacements = {
+            "'林夏雨': ('zh-CN-XiaoxiaoNeural', '+0%', '+0Hz')": "'Maya': ('en-US-JennyNeural', '+0%', '+0Hz')",
+            "'顾言': ('zh-CN-YunxiNeural', '-6%', '-2Hz')": "'Ethan': ('en-US-GuyNeural', '-6%', '-2Hz')",
+            "'神秘声音': ('zh-CN-XiaoxiaoNeural', '-14%', '-8Hz')": "'Future Maya': ('en-US-AriaNeural', '-12%', '-6Hz')",
+            "'旁白': ('zh-CN-YunjianNeural', '-8%', '-4Hz')": "'Narrator': ('en-US-DavisNeural', '-8%', '-4Hz')",
+            "VOICES['旁白']": "VOICES['Narrator']",
+            "who=='林夏雨'": "who=='Maya'",
+            "speaker=='顾言'": "speaker=='Ethan'",
+            "scene.get('speaker') in ('林夏雨','顾言')": "scene.get('speaker') in ('Maya','Ethan')",
+            "draw_person(im,'顾言'": "draw_person(im,'Ethan'",
+            "draw_person(im,'林夏雨'": "draw_person(im,'Maya'",
+            "label='悬疑短剧'": "label='THRILLER'",
+            "sender='未知号码'": "sender='UNKNOWN'",
+            "scene.get('phone_title','语音消息')": "scene.get('phone_title','VOICEMAIL')"
+          }
+          for old,new in replacements.items():
+              s = s.replace(old,new)
           old = "run(['edge-tts','--voice',voice,'--rate',rate,'--pitch',pitch,'--text',text,'--write-media',str(out)])"
           new = "run(['edge-tts','--voice',voice,f'--rate={rate}',f'--pitch={pitch}','--text',text,'--write-media',str(out)])"
-          if old not in s:
-              raise SystemExit('Expected Edge-TTS call not found')
-          p.write_text(s.replace(old,new), encoding='utf-8')
+          s = s.replace(old,new)
+          p.write_text(s, encoding='utf-8')
           PY
 
-      - name: Build Chinese short drama EP01
+      - name: Build English short drama EP01
         run: python scripts/build_short_drama.py
 
       - name: Upload finished short drama
         uses: actions/upload-artifact@v4
         with:
-          name: chinese-short-drama-ep01
+          name: the-last-voicemail-ep01
           path: |
             build_drama/short_drama_ep01.mp4
             build_drama/poster.png
             build_drama/duration.txt
             build_drama/episode_info.json
+            drama/series_bible_50.md
           if-no-files-found: error
           retention-days: 7
