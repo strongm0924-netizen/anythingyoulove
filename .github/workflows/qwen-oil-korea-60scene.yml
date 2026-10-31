@@ -1,0 +1,43 @@
+name: Qwen Oil Korea 60 Scene
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/qwen_oil_korea_60scene_voice.py"
+      - ".github/workflows/qwen-oil-korea-60scene.yml"
+  workflow_dispatch:
+
+jobs:
+  generate:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {name: "01-10", start: 1, end: 10}
+          - {name: "11-20", start: 11, end: 20}
+          - {name: "21-30", start: 21, end: 30}
+          - {name: "31-40", start: 31, end: 40}
+          - {name: "41-50", start: 41, end: 50}
+          - {name: "51-60", start: 51, end: 60}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install "qwen-tts>=0.0.5" soundfile numpy torch
+      - name: Generate narration
+        env:
+          START_SCENE: ${{ matrix.start }}
+          END_SCENE: ${{ matrix.end }}
+        run: python scripts/qwen_oil_korea_60scene_voice.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qwen-oil-korea-${{ matrix.name }}
+          path: build/qwen_oil_korea_60scene/*
+          retention-days: 7
