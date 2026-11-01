@@ -1,0 +1,48 @@
+name: Qwen AI World1 100 Scenes
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/qwen_ai_world1_runner.py"
+      - "scripts/ai_world1_chunks/**"
+      - ".github/workflows/qwen-ai-world1-100.yml"
+  workflow_dispatch:
+
+jobs:
+  generate:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {name: "001-010", start: 1, end: 10}
+          - {name: "011-020", start: 11, end: 20}
+          - {name: "021-030", start: 21, end: 30}
+          - {name: "031-040", start: 31, end: 40}
+          - {name: "041-050", start: 41, end: 50}
+          - {name: "051-060", start: 51, end: 60}
+          - {name: "061-070", start: 61, end: 70}
+          - {name: "071-080", start: 71, end: 80}
+          - {name: "081-090", start: 81, end: 90}
+          - {name: "091-100", start: 91, end: 100}
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install "qwen-tts>=0.0.5" soundfile numpy torch
+      - name: Generate narration
+        env:
+          START_SCENE: ${{ matrix.start }}
+          END_SCENE: ${{ matrix.end }}
+        run: python scripts/qwen_ai_world1_runner.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ai-world1-${{ matrix.name }}
+          path: build/qwen_ai_world1_100/*
+          retention-days: 7
